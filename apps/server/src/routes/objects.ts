@@ -3,6 +3,8 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import * as s3 from '../services/s3.js';
+import { isValidBucketName } from '../utils/validation.js';
+import { assertBucketAllowed } from '../utils/pinnedBucket.js';
 
 const router = Router();
 
@@ -26,12 +28,6 @@ function sanitizeFilename(filename: string): string {
   return path.basename(filename).replace(/[<>:"|?*\x00-\x1f]/g, '_');
 }
 
-// Validate bucket name
-function isValidBucketName(name: string): boolean {
-  // S3 bucket naming rules (simplified)
-  return /^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(name) && !name.includes('..');
-}
-
 // Validate object key -- the ../ check blocks path traversal attacks that could
 // escape the intended prefix and access/overwrite arbitrary keys in the bucket.
 function isValidObjectKey(key: string): boolean {
@@ -42,7 +38,7 @@ function isValidObjectKey(key: string): boolean {
 function getS3ErrorDetails(error: any): { message: string; s3Code?: string; status: number } {
   const s3Code = error.name || error.Code || error.$metadata?.httpStatusCode;
   const message = error.message || 'Operation failed';
-  const status = error.$metadata?.httpStatusCode || 500;
+  const status = error.status || error.$metadata?.httpStatusCode || 500;
   return { message, s3Code, status };
 }
 
@@ -56,6 +52,7 @@ router.get('/:bucket/search', async (req: Request, res: Response) => {
     if (!isValidBucketName(bucket)) {
       return res.status(400).json({ error: 'Invalid bucket name' });
     }
+    assertBucketAllowed(bucket);
     if (!query || query.length < 2) {
       return res.json({ results: [] });
     }
@@ -75,6 +72,7 @@ router.get('/:bucket', async (req: Request, res: Response) => {
     if (!isValidBucketName(bucket)) {
       return res.status(400).json({ error: 'Invalid bucket name' });
     }
+    assertBucketAllowed(bucket);
 
     const prefix = (req.query.prefix as string) || '';
     if (prefix && prefix.includes('../')) {
@@ -100,6 +98,7 @@ router.get('/:bucket/proxy', async (req: Request, res: Response) => {
     if (!isValidBucketName(bucket)) {
       return res.status(400).json({ error: 'Invalid bucket name' });
     }
+    assertBucketAllowed(bucket);
     if (!key || !isValidObjectKey(key)) {
       return res.status(400).json({ error: 'Invalid key' });
     }
@@ -147,6 +146,7 @@ router.get('/:bucket/metadata', async (req: Request, res: Response) => {
     if (!isValidBucketName(bucket)) {
       return res.status(400).json({ error: 'Invalid bucket name' });
     }
+    assertBucketAllowed(bucket);
     if (!key || !isValidObjectKey(key)) {
       return res.status(400).json({ error: 'Invalid key' });
     }
@@ -168,6 +168,7 @@ router.post('/:bucket/upload', upload.array('files'), async (req: Request, res: 
     if (!isValidBucketName(bucket)) {
       return res.status(400).json({ error: 'Invalid bucket name' });
     }
+    assertBucketAllowed(bucket);
 
     const prefix = (req.body.prefix as string) || '';
 
@@ -227,6 +228,7 @@ router.post('/:bucket/folder', async (req: Request, res: Response) => {
     if (!isValidBucketName(bucket)) {
       return res.status(400).json({ error: 'Invalid bucket name' });
     }
+    assertBucketAllowed(bucket);
     if (!folderPath || !isValidObjectKey(folderPath)) {
       return res.status(400).json({ error: 'Invalid path' });
     }
@@ -248,6 +250,7 @@ router.put('/:bucket/rename', async (req: Request, res: Response) => {
     if (!isValidBucketName(bucket)) {
       return res.status(400).json({ error: 'Invalid bucket name' });
     }
+    assertBucketAllowed(bucket);
     if (!oldKey || !newKey || !isValidObjectKey(oldKey) || !isValidObjectKey(newKey)) {
       return res.status(400).json({ error: 'Invalid keys' });
     }
@@ -273,9 +276,13 @@ router.post('/:bucket/copy', async (req: Request, res: Response) => {
     if (!isValidBucketName(bucket)) {
       return res.status(400).json({ error: 'Invalid bucket name' });
     }
+    assertBucketAllowed(bucket);
     if (destBucket && !isValidBucketName(destBucket)) {
       return res.status(400).json({ error: 'Invalid destination bucket name' });
     }
+    // destBucket in the body is the one the URL-param guard can't see.
+    // Check it here so a pinned connection can't copy OUT to another bucket.
+    assertBucketAllowed(destBucket || bucket);
     if (!sourceKey || !destKey || !isValidObjectKey(sourceKey) || !isValidObjectKey(destKey)) {
       return res.status(400).json({ error: 'Invalid keys' });
     }
@@ -298,6 +305,7 @@ router.delete('/:bucket', async (req: Request, res: Response) => {
     if (!isValidBucketName(bucket)) {
       return res.status(400).json({ error: 'Invalid bucket name' });
     }
+    assertBucketAllowed(bucket);
     if (!key || !isValidObjectKey(key)) {
       return res.status(400).json({ error: 'Invalid key' });
     }
@@ -325,6 +333,7 @@ router.post('/:bucket/batch-delete', async (req: Request, res: Response) => {
     if (!isValidBucketName(bucket)) {
       return res.status(400).json({ error: 'Invalid bucket name' });
     }
+    assertBucketAllowed(bucket);
 
     if (!Array.isArray(objects) || objects.length === 0) {
       return res.status(400).json({ error: 'No objects specified' });

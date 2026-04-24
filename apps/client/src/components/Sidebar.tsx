@@ -13,6 +13,7 @@ interface SidebarProps {
     collapsed: boolean;
     onToggleCollapse: () => void;
     activeConnectionName?: string;
+    pinnedBucket?: string;
     theme: 'dark' | 'light';
     onToggleTheme: () => void;
     onSearchChange: (value: string) => void;
@@ -37,6 +38,7 @@ export function Sidebar({
     collapsed,
     onToggleCollapse,
     activeConnectionName,
+    pinnedBucket,
     theme,
     onToggleTheme,
     onSearchChange,
@@ -130,9 +132,11 @@ export function Sidebar({
             {/* Buckets header */}
             <div className="flex items-center justify-between pl-[18px] pr-1.5 py-1.5 flex-shrink-0">
                 <span className="text-xs font-semibold text-foreground-muted uppercase tracking-wider" id="buckets-heading">Buckets</span>
-                <button onClick={onNewBucket} className="create-bucket-btn p-1.5 text-foreground-secondary hover:text-foreground transition-all" tabIndex={collapsed ? -1 : 0} aria-label="Create new bucket">
-                    <Plus className="w-3.5 h-3.5" />
-                </button>
+                {!pinnedBucket && (
+                    <button onClick={onNewBucket} className="create-bucket-btn p-1.5 text-foreground-secondary hover:text-foreground transition-all" tabIndex={collapsed ? -1 : 0} aria-label="Create new bucket">
+                        <Plus className="w-3.5 h-3.5" />
+                    </button>
+                )}
             </div>
 
             {/* Buckets list */}
@@ -156,9 +160,11 @@ export function Sidebar({
                                 <button onClick={e => handleCopyBucketName(e, bucket.name)} className="flex items-center justify-center w-6 h-6 rounded text-foreground-secondary hover:text-accent-purple active:scale-95 transition-all" tabIndex={collapsed ? -1 : 0} aria-label={`Copy: ${bucket.name}`}>
                                     {copiedBucket === bucket.name ? <Check className="w-3 h-3 text-accent-green" /> : <Copy className="w-3 h-3" />}
                                 </button>
-                                <button onClick={e => { e.stopPropagation(); onDeleteBucket(bucket.name); }} className="flex items-center justify-center w-6 h-6 rounded text-foreground-secondary hover:text-accent-red active:scale-95 transition-all" tabIndex={collapsed ? -1 : 0} aria-label={`Delete: ${bucket.name}`}>
-                                    <Trash2 className="w-3 h-3" />
-                                </button>
+                                {!pinnedBucket && (
+                                    <button onClick={e => { e.stopPropagation(); onDeleteBucket(bucket.name); }} className="flex items-center justify-center w-6 h-6 rounded text-foreground-secondary hover:text-accent-red active:scale-95 transition-all" tabIndex={collapsed ? -1 : 0} aria-label={`Delete: ${bucket.name}`}>
+                                        <Trash2 className="w-3 h-3" />
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -199,9 +205,11 @@ export function Sidebar({
             <button onClick={onNavigateHome} className="w-8 h-8 flex items-center justify-center my-0.5 flex-shrink-0" aria-label="Home" title="S3 Explorer">
                 <img src="/logo.svg" alt="S3 Explorer" className="w-5 h-5 logo-themed" />
             </button>
-            <button onClick={onNewBucket} className="w-8 h-8 flex items-center justify-center text-foreground-muted hover:text-foreground transition-colors flex-shrink-0" aria-label="Create bucket" title="Create bucket">
-                <Plus className="w-3.5 h-3.5" />
-            </button>
+            {!pinnedBucket && (
+                <button onClick={onNewBucket} className="w-8 h-8 flex items-center justify-center text-foreground-muted hover:text-foreground transition-colors flex-shrink-0" aria-label="Create bucket" title="Create bucket">
+                    <Plus className="w-3.5 h-3.5" />
+                </button>
+            )}
             <div className="w-5 h-px bg-border my-0.5 flex-shrink-0" />
             <div className="flex-1 flex flex-col items-center gap-px overflow-y-auto min-h-0 bucket-scrollable w-full px-1">
                 {buckets.map(bucket => (

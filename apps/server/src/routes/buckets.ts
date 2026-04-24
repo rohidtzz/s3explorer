@@ -1,23 +1,25 @@
 import { Router, Request, Response } from 'express';
 import * as s3 from '../services/s3.js';
+import { connections } from '../services/db.js';
+import { isValidBucketName } from '../utils/validation.js';
 
 const router = Router();
-
-// Validate bucket name
-function isValidBucketName(name: string): boolean {
-  return /^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/.test(name) && !name.includes('..');
-}
 
 // Helper to extract S3 error details
 function getS3ErrorDetails(error: any): { message: string; s3Code?: string; status: number } {
   const s3Code = error.name || error.Code || error.$metadata?.httpStatusCode;
   const message = error.message || 'Operation failed';
-  const status = error.$metadata?.httpStatusCode || 500;
+  const status = error.status || error.$metadata?.httpStatusCode || 500;
   return { message, s3Code, status };
 }
 
 router.get('/', async (req: Request, res: Response) => {
   try {
+    const active = connections.getActive();
+    if (active?.bucket) {
+      // Single-bucket connection (e.g., GCS): don't call ListBuckets (provider may reject it).
+      return res.json({ buckets: [{ name: active.bucket, creationDate: null }] });
+    }
     const buckets = await s3.listBuckets();
     res.json({ buckets });
   } catch (error: any) {
@@ -33,6 +35,10 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.post('/', async (req: Request, res: Response) => {
   try {
+    if (connections.getActive()?.bucket) {
+      return res.status(403).json({ error: 'Creating buckets is disabled for single-bucket connections. Unpin the connection to manage buckets.' });
+    }
+
     const { name } = req.body;
     if (!name) {
       return res.status(400).json({ error: 'Bucket name required' });
@@ -52,6 +58,10 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.delete('/:name', async (req: Request, res: Response) => {
   try {
+    if (connections.getActive()?.bucket) {
+      return res.status(403).json({ error: 'Deleting buckets is disabled for single-bucket connections. Unpin the connection to manage buckets.' });
+    }
+
     const { name } = req.params;
     if (!isValidBucketName(name)) {
       return res.status(400).json({ error: 'Invalid bucket name' });

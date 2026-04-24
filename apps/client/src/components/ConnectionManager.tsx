@@ -96,6 +96,19 @@ const GENERIC_REGIONS = [
   { value: 'ap-southeast-1', label: 'AP Southeast 1' },
 ];
 
+// Mirror of server-side isValidBucketName: DNS-safe S3 bucket name rules.
+const BUCKET_NAME_RE = /^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/;
+function validateBucketName(name: string, providerId: string): string | null {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    return providerId === 'gcs' ? 'Required for Google Cloud Storage' : null;
+  }
+  if (!BUCKET_NAME_RE.test(trimmed) || trimmed.includes('..')) {
+    return 'Lowercase letters, numbers, dots, hyphens; 3–63 chars';
+  }
+  return null;
+}
+
 // Helper to get regions based on provider
 function getRegionsForProvider(providerId: string) {
   switch (providerId) {
@@ -131,6 +144,7 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [bucketTouched, setBucketTouched] = useState(false);
 
   // Form State
   const [selectedProvider, setSelectedProvider] = useState<string>('custom');
@@ -188,6 +202,7 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
     setView('list');
     setTestResult(null);
     setError(null);
+    setBucketTouched(false);
   }
 
   function handleProviderChange(providerId: string) {
@@ -499,12 +514,19 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
                     id="conn-bucket"
                     type="text"
                     value={form.bucket || ''}
-                    onChange={(e) => setForm({ ...form, bucket: e.target.value })}
+                    onChange={(e) => { setBucketTouched(true); setForm({ ...form, bucket: e.target.value }); }}
+                    onBlur={() => setBucketTouched(true)}
                     placeholder={selectedProvider === 'gcs' ? 'my-bucket-name' : 'Leave empty to list all buckets'}
                     className="input h-9 text-sm"
+                    aria-invalid={!!(bucketTouched && validateBucketName(form.bucket || '', selectedProvider))}
                     autoComplete="off"
                     spellCheck="false"
                   />
+                  {bucketTouched && validateBucketName(form.bucket || '', selectedProvider) && (
+                    <p className="text-[11px] text-accent-red leading-tight">
+                      {validateBucketName(form.bucket || '', selectedProvider)}
+                    </p>
+                  )}
                 </div>
 
                 {/* Keys Row */}
@@ -598,7 +620,7 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
                 </button>
                 <button
                   onClick={handleSave}
-                  disabled={saving || !form.name || !form.endpoint}
+                  disabled={saving || !form.name || !form.endpoint || !!validateBucketName(form.bucket || '', selectedProvider)}
                   className="py-2 px-3 rounded-md bg-accent-purple text-white hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium"
                 >
                   {saving ? 'Saving...' : 'Save'}

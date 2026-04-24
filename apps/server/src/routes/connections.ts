@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { connections, ConnectionRecord } from '../services/db.js';
 import { encryptAndPack, unpackAndDecrypt } from '../services/crypto.js';
 import { listBuckets, testBucketAccess, S3ConnectionConfig } from '../services/s3.js';
+import { isValidBucketName } from '../utils/validation.js';
 
 const router = Router();
 
@@ -58,6 +59,11 @@ router.post('/', async (req: Request, res: Response) => {
 
     if (!name?.trim() || !endpoint?.trim() || !accessKey?.trim() || !secretKey?.trim()) {
       res.status(400).json({ error: 'name, endpoint, accessKey, secretKey required and cannot be empty' });
+      return;
+    }
+
+    if (bucket && !isValidBucketName(bucket)) {
+      res.status(400).json({ error: 'Invalid bucket name. Use 3–63 lowercase letters, numbers, dots, and hyphens.' });
       return;
     }
 
@@ -125,6 +131,11 @@ router.put('/:id', async (req: Request, res: Response) => {
     const id = parseInt(req.params.id, 10);
     const { name, endpoint, accessKey, secretKey, region, forcePathStyle } = req.body;
     const bucket = req.body.bucket !== undefined ? (req.body.bucket?.trim() || null) : undefined;
+
+    if (bucket && !isValidBucketName(bucket)) {
+      res.status(400).json({ error: 'Invalid bucket name. Use 3–63 lowercase letters, numbers, dots, and hyphens.' });
+      return;
+    }
 
     const existing = connections.getById(id);
     if (!existing) {
@@ -250,6 +261,11 @@ router.post('/test', async (req: Request, res: Response) => {
 
     if (!endpoint || !accessKey || !secretKey) {
       res.status(400).json({ error: 'endpoint, accessKey, secretKey required' });
+      return;
+    }
+
+    if (bucket && !isValidBucketName(bucket)) {
+      res.status(400).json({ error: 'Invalid bucket name. Use 3–63 lowercase letters, numbers, dots, and hyphens.' });
       return;
     }
 

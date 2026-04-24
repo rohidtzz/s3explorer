@@ -807,6 +807,7 @@ export default function App() {
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(c => !c)}
         activeConnectionName={activeConnection?.name}
+        pinnedBucket={activeConnection?.bucket ?? undefined}
         theme={theme}
         onToggleTheme={toggleTheme}
         onSearchChange={setSearchQuery}
