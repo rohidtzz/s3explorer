@@ -34,6 +34,14 @@ export interface S3ConnectionConfig {
 // connection can change at any time (user switches connections in the UI), and the
 // AWS SDK caches internal state per client, so reusing a stale client would silently
 // talk to the wrong endpoint.
+//
+// requestChecksumCalculation/responseChecksumValidation are pinned to WHEN_REQUIRED
+// because @aws-sdk/client-s3 v3.729+ defaults them to WHEN_SUPPORTED, which auto-adds
+// CRC32 checksum trailers + aws-chunked encoding to PutObject/UploadPart. Non-AWS
+// S3-compatible providers (GCS, Cloudflare R2, Backblaze B2, older MinIO) don't
+// implement those headers and reject the request with SignatureDoesNotMatch.
+// WHEN_REQUIRED still emits checksums for operations that mandate them (e.g.
+// DeleteObjects), so AWS S3 behavior is unchanged.
 function getS3Client(configOverride?: S3ConnectionConfig): S3Client {
   if (configOverride) {
     return new S3Client({
@@ -44,6 +52,8 @@ function getS3Client(configOverride?: S3ConnectionConfig): S3Client {
         secretAccessKey: configOverride.secretKey,
       },
       forcePathStyle: configOverride.forcePathStyle ?? true,
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
     });
   }
 
@@ -66,6 +76,8 @@ function getS3Client(configOverride?: S3ConnectionConfig): S3Client {
       secretAccessKey: secretKey,
     },
     forcePathStyle: !!active.force_path_style,
+    requestChecksumCalculation: 'WHEN_REQUIRED',
+    responseChecksumValidation: 'WHEN_REQUIRED',
   });
 }
 
