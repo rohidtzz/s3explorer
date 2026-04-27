@@ -16,9 +16,10 @@ Supported Providers:
 
 1. Railway Buckets
 2. AWS S3
-3. Cloudflare R2
-4. MinIO
-5. DigitalOcean Spaces
+3. Google Cloud Storage
+4. Cloudflare R2
+5. MinIO
+6. DigitalOcean Spaces
 
 ### Screenshots
 
@@ -74,7 +75,7 @@ flowchart TB
 
 1. Password Auth: Single password via env var or setup wizard (Argon2id hashed)
 2. Encrypted Credentials: S3 credentials encrypted at rest with AES-256-GCM
-3. Secure Sessions: Server-side SQLite sessions with httpOnly/secure/sameSite=strict cookies
+3. Secure Sessions: Server-side SQLite sessions with httpOnly + sameSite=strict cookies (secure flag auto-enabled over HTTPS)
 4. Rate Limiting: IP-based, 10 attempts per 15 min, 30 min lockout
 5. Security Headers: Helmet.js enabled (CSP, HSTS, etc.)
 6. No Client Storage: Credentials never stored in browser localStorage
@@ -198,6 +199,16 @@ Backend runs on :3000, frontend on :5173.
    1. Endpoint: `https://s3.<region>.amazonaws.com`
    2. Access Key: Generated Access Key ID
    3. Secret Key: Generated Secret Access Key
+
+#### Google Cloud Storage
+
+1. Go to Google Cloud Console → Cloud Storage → Settings → Interoperability
+2. Create an HMAC key under your user account or a service account
+3. Use values:
+   1. Endpoint: `https://storage.googleapis.com`
+   2. Access Key: Generated HMAC Access Key
+   3. Secret Key: Generated HMAC Secret
+   4. Bucket Name: Required — GCS interop requires the connection scoped to one bucket
 
 #### DigitalOcean Spaces
 
