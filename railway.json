@@ -4,7 +4,11 @@
     "builder": "DOCKERFILE",
     "dockerfilePath": "Dockerfile",
     "watchPatterns": [
-      "/**"
+      "Dockerfile",
+      "docker-entrypoint.sh",
+      "railway.json",
+      "apps/server/**",
+      "apps/client/**"
     ]
   },
   "deploy": {
