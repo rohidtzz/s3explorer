@@ -15,7 +15,7 @@ import {
   CompleteMultipartUploadCommand,
   AbortMultipartUploadCommand,
 } from '@aws-sdk/client-s3';
-import { Readable } from 'stream';
+import fs from 'fs';
 import { connections } from './db.js';
 import { unpackAndDecrypt } from './crypto.js';
 import type { BucketInfo, ObjectInfo, ObjectMetadata } from '../types/index.js';
@@ -231,128 +231,112 @@ async function deleteObjectWithClient(client: S3Client, bucket: string, key: str
 }
 
 // 100MB threshold: below this, a single PutObject is simpler and has less overhead.
-// Above it, multipart gives us parallel uploads and resumability.
+// Above it, multipart gives us parallel uploads and bounded memory.
 const MULTIPART_THRESHOLD = 100 * 1024 * 1024;
 // 10MB parts: S3 minimum is 5MB, but 10MB reduces the total number of parts (and API
 // calls) while still keeping memory per part reasonable for the server.
 const PART_SIZE = 10 * 1024 * 1024;
+// Max concurrent in-flight UploadPart requests. Caps peak memory at
+// PART_CONCURRENCY * PART_SIZE = 50MB regardless of file size.
+const PART_CONCURRENCY = 5;
 
-export async function uploadObject(
+// Uploads a file from disk. Always sends Buffer-shaped bodies, never a Readable
+// stream -- streaming Body triggers chunked SigV4 signing
+// (`x-amz-content-sha256: STREAMING-AWS4-HMAC-SHA256-PAYLOAD` + `Content-Encoding:
+// aws-chunked`), which Google Cloud Storage's S3 interop layer rejects with
+// SignatureDoesNotMatch. Buffer bodies get hashed once, signed once, and verified
+// the same way by every S3-compatible provider.
+//
+// Memory: small files load fully (≤ MULTIPART_THRESHOLD); large files use
+// positional fd.read so we never hold more than PART_CONCURRENCY * PART_SIZE in
+// memory regardless of total file size.
+export async function uploadFile(
   bucket: string,
   key: string,
-  body: Buffer,
+  filePath: string,
+  size: number,
   contentType?: string
 ): Promise<void> {
   const client = getS3Client();
 
-  // Use multipart upload for large files
-  if (body.length > MULTIPART_THRESHOLD) {
-    await uploadMultipart(client, bucket, key, body, contentType);
+  if (size <= MULTIPART_THRESHOLD) {
+    const body = await fs.promises.readFile(filePath);
+    await client.send(new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+    }));
     return;
   }
 
-  const command = new PutObjectCommand({
-    Bucket: bucket,
-    Key: key,
-    Body: body,
-    ContentType: contentType,
-  });
-  await client.send(command);
-}
-
-export async function uploadObjectStream(
-  bucket: string,
-  key: string,
-  body: Readable,
-  contentType?: string,
-  contentLength?: number
-): Promise<void> {
-  const client = getS3Client();
-  const command = new PutObjectCommand({
-    Bucket: bucket,
-    Key: key,
-    Body: body,
-    ContentType: contentType,
-    ContentLength: contentLength,
-  });
-  await client.send(command);
-}
-
-// Multipart upload for large files
-async function uploadMultipart(
-  client: S3Client,
-  bucket: string,
-  key: string,
-  body: Buffer,
-  contentType?: string
-): Promise<void> {
-  // Start multipart upload
-  const createCommand = new CreateMultipartUploadCommand({
-    Bucket: bucket,
-    Key: key,
-    ContentType: contentType,
-  });
-  const { UploadId } = await client.send(createCommand);
-
-  if (!UploadId) {
-    throw new Error('Failed to initiate multipart upload');
-  }
+  const fd = await fs.promises.open(filePath, 'r');
+  let uploadId: string | undefined;
 
   try {
-    const parts: { ETag: string; PartNumber: number }[] = [];
-    const totalParts = Math.ceil(body.length / PART_SIZE);
+    const created = await client.send(new CreateMultipartUploadCommand({
+      Bucket: bucket,
+      Key: key,
+      ContentType: contentType,
+    }));
+    uploadId = created.UploadId;
+    if (!uploadId) {
+      throw new Error('Failed to initiate multipart upload');
+    }
 
-    // Upload parts in parallel (max 5 concurrent)
-    const concurrency = 5;
-    for (let i = 0; i < totalParts; i += concurrency) {
-      const batch = [];
-      for (let j = i; j < Math.min(i + concurrency, totalParts); j++) {
+    const totalParts = Math.ceil(size / PART_SIZE);
+    const parts: { ETag: string; PartNumber: number }[] = [];
+
+    for (let i = 0; i < totalParts; i += PART_CONCURRENCY) {
+      const batch: Promise<{ ETag: string; PartNumber: number }>[] = [];
+      for (let j = i; j < Math.min(i + PART_CONCURRENCY, totalParts); j++) {
         const partNumber = j + 1;
-        const start = j * PART_SIZE;
-        const end = Math.min(start + PART_SIZE, body.length);
-        const partBody = body.subarray(start, end);
+        const offset = j * PART_SIZE;
+        const length = Math.min(PART_SIZE, size - offset);
+        // allocUnsafe is fine: fd.read overwrites the full range we hand it.
+        const buf = Buffer.allocUnsafe(length);
+        await fd.read(buf, 0, length, offset);
 
         batch.push(
           client.send(new UploadPartCommand({
             Bucket: bucket,
             Key: key,
-            UploadId,
+            UploadId: uploadId,
             PartNumber: partNumber,
-            Body: partBody,
+            Body: buf,
           })).then(result => ({
             ETag: result.ETag!,
             PartNumber: partNumber,
           }))
         );
       }
-
-      const results = await Promise.all(batch);
-      parts.push(...results);
+      parts.push(...await Promise.all(batch));
     }
 
-    // Sort parts by part number (required for completion)
+    // S3 requires parts ordered by PartNumber on completion.
     parts.sort((a, b) => a.PartNumber - b.PartNumber);
 
-    // Complete multipart upload
-    const completeCommand = new CompleteMultipartUploadCommand({
+    await client.send(new CompleteMultipartUploadCommand({
       Bucket: bucket,
       Key: key,
-      UploadId,
+      UploadId: uploadId,
       MultipartUpload: { Parts: parts },
-    });
-    await client.send(completeCommand);
+    }));
   } catch (error) {
-    // Abort on error
-    try {
-      await client.send(new AbortMultipartUploadCommand({
-        Bucket: bucket,
-        Key: key,
-        UploadId,
-      }));
-    } catch (abortError) {
-      console.error('Failed to abort multipart upload:', abortError);
+    if (uploadId) {
+      try {
+        await client.send(new AbortMultipartUploadCommand({
+          Bucket: bucket,
+          Key: key,
+          UploadId: uploadId,
+        }));
+      } catch (abortError) {
+        console.error('Failed to abort multipart upload:', abortError);
+      }
     }
     throw error;
+  } finally {
+    await fd.close();
   }
 }
 

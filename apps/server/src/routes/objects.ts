@@ -198,8 +198,7 @@ router.post('/:bucket/upload', upload.array('files'), async (req: Request, res: 
         continue; // Skip invalid keys
       }
 
-      const fileStream = fs.createReadStream(file.path);
-      await s3.uploadObjectStream(bucket, key, fileStream, file.mimetype, file.size);
+      await s3.uploadFile(bucket, key, file.path, file.size, file.mimetype);
       results.push({ key, size: file.size });
     }
 
@@ -209,9 +208,9 @@ router.post('/:bucket/upload', upload.array('files'), async (req: Request, res: 
     const { message, s3Code, status } = getS3ErrorDetails(error);
     res.status(status).json({ error: message, s3Code });
   } finally {
-    // Multer writes uploads to disk before we stream them to S3. Always clean up
-    // temp files -- even on error -- to prevent disk fill on repeated failures.
-    // allSettled so one unlink failure doesn't block the rest.
+    // Multer writes uploads to disk before we read them into Buffer payloads.
+    // Always clean up temp files -- even on error -- to prevent disk fill on
+    // repeated failures. allSettled so one unlink failure doesn't block the rest.
     await Promise.allSettled(
       files
         .filter(file => file.path)
