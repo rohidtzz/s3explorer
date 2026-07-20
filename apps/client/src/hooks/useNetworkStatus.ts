@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { API_BASE } from '../api';
 
 interface NetworkStatus {
     isOnline: boolean;
@@ -29,7 +30,7 @@ export function useNetworkStatus(): NetworkStatus {
 
             // We ping /api/auth/status because it's lightweight, always available, and
             // even a 401 proves the backend is running (just unauthenticated).
-            const response = await fetch('/api/auth/status', {
+            const response = await fetch(`${API_BASE}/auth/status`, {
                 method: 'GET',
                 signal: controller.signal,
                 credentials: 'include',

@@ -10,7 +10,7 @@ const router = Router();
 
 // File size limit (per file)
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
-const DATA_DIR = process.env.DATA_DIR || '/data';
+const DATA_DIR = process.env.DATA_DIR || './data';
 const UPLOAD_TEMP_DIR = path.join(DATA_DIR, 'tmp-uploads');
 
 if (!fs.existsSync(UPLOAD_TEMP_DIR)) {

@@ -4,7 +4,7 @@ import fs from 'fs';
 import { EventEmitter } from 'events';
 import session from 'express-session';
 
-const DATA_DIR = process.env.DATA_DIR || '/data';
+const DATA_DIR = process.env.DATA_DIR || './data';
 const DB_PATH = path.join(DATA_DIR, 's3explorer.db');
 
 // Ensure data directory exists

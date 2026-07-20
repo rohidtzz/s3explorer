@@ -1,8 +1,9 @@
 import type { Bucket, S3Object } from './types';
 import { API_TIMEOUTS } from './constants';
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
+export { API_BASE };
 export type { Bucket, S3Object };
 
 // Dedup concurrent requests: navigating fast fires multiple list calls for the
