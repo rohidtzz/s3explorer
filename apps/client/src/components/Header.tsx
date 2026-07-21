@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, RefreshCw, Menu, Search, FolderPlus } from 'lucide-react';
+import { Icons } from './Icons';
 
 interface HeaderProps {
     selectedBucket: string | null;
@@ -69,7 +69,7 @@ export function Header({
                     className="btn btn-ghost btn-icon md:hidden flex-shrink-0 w-10 h-10 sm:w-9 sm:h-9"
                     aria-label="Open sidebar menu"
                 >
-                    <Menu className="w-5 h-5" aria-hidden="true" />
+                    <Icons.Menu className="w-5 h-5" aria-hidden="true" />
                 </button>
 
                 {currentPath && (
@@ -78,7 +78,7 @@ export function Header({
                         className="btn btn-ghost btn-icon flex-shrink-0 w-10 h-10 sm:w-9 sm:h-9 rounded-full"
                         aria-label="Go back to parent folder"
                     >
-                        <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+                        <Icons.ChevronLeft className="w-5 h-5" aria-hidden="true" />
                     </button>
                 )}
 
@@ -129,7 +129,7 @@ export function Header({
                         className="flex items-center gap-1.5 px-2.5 py-1 text-sm text-foreground-muted hover:text-foreground bg-background-tertiary hover:bg-background-hover border border-border hover:border-border-hover rounded-md transition-all w-[170px]"
                         aria-label={`Open command palette (${isMac ? 'Cmd' : 'Ctrl'}+K)`}
                     >
-                        <Search className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+                        <Icons.Search className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
                         <span className="text-xs">Search...</span>
                         <kbd className="flex items-center gap-0.5 px-1 py-0.5 text-xs font-medium bg-background border border-border rounded ml-auto" aria-hidden="true">
                             <span>{isMac ? '⌘' : 'Ctrl'}</span>
@@ -148,7 +148,7 @@ export function Header({
                             className="btn btn-secondary h-9 sm:h-8 px-2.5 sm:px-2 rounded-full border border-border hover:border-border-hover dark:border-white/20 transition-all flex items-center gap-2"
                             aria-label="Create new folder"
                         >
-                            <FolderPlus className="w-5 h-5 sm:w-4 sm:h-4" aria-hidden="true" />
+                            <Icons.FolderPlus className="w-5 h-5 sm:w-4 sm:h-4" aria-hidden="true" />
                             <span className="hidden md:inline text-sm font-medium">Folder</span>
                         </button>
 
@@ -174,7 +174,7 @@ export function Header({
                     className="btn btn-ghost btn-icon w-10 h-10 sm:w-9 sm:h-9"
                     aria-label={loading ? 'Refreshing...' : 'Refresh file list'}
                 >
-                    <RefreshCw className={`w-5 h-5 ${isSpinning ? 'animate-spin-once' : ''}`} aria-hidden="true" />
+                    <Icons.RefreshCw className={`w-5 h-5 ${isSpinning ? 'animate-spin-once' : ''}`} aria-hidden="true" />
                 </button>
             </div>
         </header>

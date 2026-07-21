@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Check, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Icons } from './Icons';
 import * as api from '../api';
 
 interface SetupPageProps {
@@ -96,7 +96,7 @@ export function SetupPage({ onSetupComplete }: SetupPageProps) {
                                     onClick={() => setShowSecret(!showSecret)}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-muted hover:text-foreground transition-colors"
                                 >
-                                    {showSecret ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    {showSecret ? <Icons.EyeOff className="w-4 h-4" /> : <Icons.Eye className="w-4 h-4" />}
                                 </button>
                             </div>
                         </div>
@@ -113,7 +113,7 @@ export function SetupPage({ onSetupComplete }: SetupPageProps) {
                                     <div key={i} className="flex items-center gap-2 text-sm">
                                         <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${req.valid ? 'bg-accent-green/20 text-accent-green' : 'bg-background-tertiary text-foreground-muted'
                                             }`}>
-                                            {req.valid && <Check className="w-2.5 h-2.5" />}
+                                            {req.valid && <Icons.Check className="w-2.5 h-2.5" />}
                                         </div>
                                         <span className={req.valid ? 'text-foreground' : 'text-foreground-secondary'}>
                                             {req.label}
@@ -144,7 +144,7 @@ export function SetupPage({ onSetupComplete }: SetupPageProps) {
                                         onClick={() => setShowPassword(!showPassword)}
                                         className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-muted hover:text-foreground transition-colors"
                                     >
-                                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        {showPassword ? <Icons.EyeOff className="w-4 h-4" /> : <Icons.Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
                             </div>
@@ -168,7 +168,7 @@ export function SetupPage({ onSetupComplete }: SetupPageProps) {
                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                         className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-muted hover:text-foreground transition-colors"
                                     >
-                                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        {showConfirmPassword ? <Icons.EyeOff className="w-4 h-4" /> : <Icons.Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
                             </div>
@@ -184,7 +184,7 @@ export function SetupPage({ onSetupComplete }: SetupPageProps) {
                                     <div key={i} className="flex items-center gap-2 text-sm">
                                         <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${req.valid ? 'bg-accent-green/20 text-accent-green' : 'bg-background-tertiary text-foreground-muted'
                                             }`}>
-                                            {req.valid && <Check className="w-2.5 h-2.5" />}
+                                            {req.valid && <Icons.Check className="w-2.5 h-2.5" />}
                                         </div>
                                         <span className={req.valid ? 'text-foreground' : 'text-foreground-secondary'}>
                                             {req.label}
@@ -196,7 +196,7 @@ export function SetupPage({ onSetupComplete }: SetupPageProps) {
 
                         {error && (
                             <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-md flex items-start gap-3 text-sm text-red-500">
-                                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                <Icons.AlertCircle className="w-5 h-5 flex-shrink-0" />
                                 <span>{error}</span>
                             </div>
                         )}
@@ -217,7 +217,7 @@ export function SetupPage({ onSetupComplete }: SetupPageProps) {
                             ) : (
                                 <span className="flex items-center gap-2">
                                     Complete Setup
-                                    <ArrowRight className="w-4 h-4" />
+                                    <Icons.ArrowRight className="w-4 h-4" />
                                 </span>
                             )}
                         </button>

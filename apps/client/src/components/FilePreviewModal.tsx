@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Download, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { Icons } from './Icons';
 import type { S3Object } from '../types';
 import { getFileName, getPreviewType } from '../utils/fileUtils';
 import { getProxyUrl } from '../api';
@@ -251,22 +251,22 @@ export function FilePreviewModal({ object, bucket, onClose, onDownload, objects,
                     {previewType === 'image' && imageLoaded && (
                         <>
                             <button onClick={(e) => { e.stopPropagation(); zoomOut(); }} className="btn btn-ghost btn-icon w-9 h-9 sm:w-8 sm:h-8" aria-label="Zoom out" disabled={zoom <= ZOOM_MIN}>
-                                <ZoomOut className="w-4 h-4" />
+                                <Icons.ZoomOut className="w-4 h-4" />
                             </button>
                             <button onClick={(e) => { e.stopPropagation(); zoomReset(); }} className="btn btn-ghost btn-icon w-9 h-9 sm:w-8 sm:h-8" aria-label="Reset zoom">
-                                <Maximize className="w-4 h-4" />
+                                <Icons.Maximize className="w-4 h-4" />
                             </button>
                             <button onClick={(e) => { e.stopPropagation(); zoomIn(); }} className="btn btn-ghost btn-icon w-9 h-9 sm:w-8 sm:h-8" aria-label="Zoom in" disabled={zoom >= ZOOM_MAX}>
-                                <ZoomIn className="w-4 h-4" />
+                                <Icons.ZoomIn className="w-4 h-4" />
                             </button>
                             <div className="w-px h-5 bg-border mx-0.5" />
                         </>
                     )}
                     <button onClick={(e) => { e.stopPropagation(); onDownload(activeObject); }} className="btn btn-ghost btn-icon w-9 h-9 sm:w-8 sm:h-8" aria-label="Download file">
-                        <Download className="w-4 h-4" />
+                        <Icons.Download className="w-4 h-4" />
                     </button>
                     <button onClick={onClose} className="btn btn-ghost btn-icon w-9 h-9 sm:w-8 sm:h-8" aria-label="Close preview">
-                        <X className="w-4 h-4" />
+                        <Icons.X className="w-4 h-4" />
                     </button>
                 </div>
             </div>
@@ -283,7 +283,7 @@ export function FilePreviewModal({ object, bucket, onClose, onDownload, objects,
                         className="preview-nav-arrow absolute left-1.5 sm:left-3 z-10"
                         aria-label="Previous file"
                     >
-                        <ChevronLeft className="w-5 h-5" />
+                        <Icons.ChevronLeft className="w-5 h-5" />
                     </button>
                 )}
 
@@ -299,7 +299,7 @@ export function FilePreviewModal({ object, bucket, onClose, onDownload, objects,
                         className="preview-nav-arrow absolute right-1.5 sm:right-3 z-10"
                         aria-label="Next file"
                     >
-                        <ChevronRight className="w-5 h-5" />
+                        <Icons.ChevronRight className="w-5 h-5" />
                     </button>
                 )}
             </div>
@@ -311,13 +311,13 @@ export function FilePreviewModal({ object, bucket, onClose, onDownload, objects,
                     onClick={e => e.stopPropagation()}
                 >
                     <button onClick={goToPrev} disabled={!hasPrev} className="text-xs text-foreground-secondary hover:text-foreground disabled:opacity-30 transition-colors flex items-center gap-1">
-                        <ChevronLeft className="w-3.5 h-3.5" />Prev
+                        <Icons.ChevronLeft className="w-3.5 h-3.5" />Prev
                     </button>
                     <span className="text-xs text-foreground-muted tabular-nums">
                         {currentIndex + 1} of {totalCount}
                     </span>
                     <button onClick={goToNext} disabled={!hasNext} className="text-xs text-foreground-secondary hover:text-foreground disabled:opacity-30 transition-colors flex items-center gap-1">
-                        Next<ChevronRight className="w-3.5 h-3.5" />
+                        Next<Icons.ChevronRight className="w-3.5 h-3.5" />
                     </button>
                 </div>
             )}

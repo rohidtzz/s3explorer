@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { Icons } from './Icons';
 
 interface ErrorBannerProps {
     error: string | null;
@@ -21,7 +21,7 @@ export function ErrorBanner({ error, onDismiss }: ErrorBannerProps) {
                 className="btn btn-ghost btn-icon text-accent-red"
                 aria-label="Dismiss error"
             >
-                <X className="w-4 h-4" aria-hidden="true" />
+                <Icons.X className="w-4 h-4" aria-hidden="true" />
             </button>
         </div>
     );

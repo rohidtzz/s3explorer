@@ -1,4 +1,4 @@
-import { WifiOff, RefreshCw } from 'lucide-react';
+import { Icons } from './Icons';
 
 interface OfflineIndicatorProps {
     isOnline: boolean;
@@ -24,14 +24,14 @@ export function OfflineIndicator({ isOnline, isBackendReachable }: OfflineIndica
             aria-live="assertive"
         >
             <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-accent-red/15 border border-accent-purple/40 shadow-lg backdrop-blur-sm">
-                <WifiOff className="w-4 h-4 text-accent-red flex-shrink-0" />
+                <Icons.WifiOff className="w-4 h-4 text-accent-red flex-shrink-0" />
                 <span className="text-xs sm:text-sm text-foreground font-medium">{message}</span>
                 <button
                     onClick={handleRetry}
                     className="flex items-center gap-1 sm:gap-1.5 text-xs text-accent-red hover:text-accent-red/80 transition-colors ml-1 sm:ml-2"
                     aria-label="Retry connection"
                 >
-                    <RefreshCw className="w-3 h-3" />
+                    <Icons.RefreshCw className="w-3 h-3" />
                     Retry
                 </button>
             </div>

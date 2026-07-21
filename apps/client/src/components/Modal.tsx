@@ -1,5 +1,5 @@
 import { useEffect, useRef, useId, useCallback } from 'react';
-import { X } from 'lucide-react';
+import { Icons } from './Icons';
 
 interface ModalProps {
     title: string;
@@ -110,7 +110,7 @@ export function Modal({ title, children, onClose, isOpen = true, size = 'md' }: 
                         className="btn btn-ghost btn-icon w-8 h-8 text-foreground-muted hover:text-foreground"
                         aria-label="Close modal"
                     >
-                        <X className="w-4 h-4" aria-hidden="true" />
+                        <Icons.X className="w-4 h-4" aria-hidden="true" />
                     </button>
                 </div>
                 <div className="p-4 flex-1 overflow-y-auto">{children}</div>

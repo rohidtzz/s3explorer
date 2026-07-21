@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, EyeOff, AlertCircle, ArrowRight, Check } from 'lucide-react';
+import { Icons } from './Icons';
 import * as api from '../api';
 
 interface LoginPageProps {
@@ -87,7 +87,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-foreground-muted hover:text-foreground transition-colors w-11"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden="true" /> : <Eye className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden="true" />}
+                    {showPassword ? <Icons.EyeOff className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden="true" /> : <Icons.Eye className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden="true" />}
                   </button>
                 </div>
               </div>
@@ -100,7 +100,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                     }`}
                   aria-hidden="true"
                 >
-                  {rememberMe && <Check className="w-3 h-3 text-white" aria-hidden="true" />}
+                  {rememberMe && <Icons.Check className="w-3 h-3 text-white" aria-hidden="true" />}
                 </span>
                 <input
                   type="checkbox"
@@ -114,7 +114,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
               {error && (
                 <div id="login-error" className="p-3 rounded-md bg-accent-red/10 border border-accent-red/20 text-accent-red text-sm flex items-center gap-2" role="alert">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                  <Icons.AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                   {error}
                 </div>
               )}
@@ -135,7 +135,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 ) : (
                   <span className="flex items-center gap-2">
                     Continue
-                    <ArrowRight className="w-4 h-4" />
+                    <Icons.ArrowRight className="w-4 h-4" />
                   </span>
                 )}
               </button>

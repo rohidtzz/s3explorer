@@ -96,7 +96,7 @@ body {
   min-height: 100%;
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -105,6 +105,14 @@ body {
   min-height: 100vh;
   background: var(--background);
   position: relative;
+}
+
+/* On the Capacitor Android WebView, `100vh` can outgrow the visible viewport
+   when the soft keyboard opens (fixed by `Keyboard.resize=native` but not
+   universally). Constrain to the smaller of the two so the layout never
+   leaves a coloured gap at the top of the frame. */
+html.capacitor-native #root {
+  min-height: 100dvh;
 }
 
 /* Hide scrollbars by default but allow scrolling */
@@ -803,8 +811,163 @@ textarea:focus-visible {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
 .pb-safe {
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+/* =========================================================================
+   Low-end mobile / touch-first performance overrides
+   -------------------------------------------------------------------------
+   Touch devices ("coarse pointer") are almost always mobile with a modest
+   GPU. `backdrop-filter: blur()` is one of the most expensive layout ops on
+   Android WebView, and long compound animations cause jank on low-end SoCs.
+   We swap blur for solid backgrounds and shorten decorative animations to a
+   simple fade so the app stays smooth on entry-level phones.
+   ========================================================================= */
+@media (hover: none) and (pointer: coarse) {
+  /* Kill backdrop-filter across the app - biggest single perf win on Android */
+  .glass,
+  .modal-backdrop,
+  .command-palette-backdrop,
+  .command-palette-content,
+  .preview-nav-arrow {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Use solid, opaque backgrounds instead so contrast is preserved */
+  .modal-backdrop {
+    background: rgba(0, 0, 0, 0.72);
+  }
+  [data-theme="light"] .modal-backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .command-palette-backdrop {
+    background: rgba(0, 0, 0, 0.82);
+  }
+  [data-theme="light"] .command-palette-backdrop {
+    background: rgba(0, 0, 0, 0.55);
+  }
+  .glass {
+    background: var(--background-secondary);
+  }
+  .preview-nav-arrow {
+    background: rgba(0, 0, 0, 0.55);
+  }
+  [data-theme="light"] .preview-nav-arrow {
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  /* Drop expensive box-shadow on modal / command palette */
+  .command-palette-content {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Collapse decorative slide/scale animations to a plain fade.
+     Feels almost identical, costs ~zero compositor work. */
+  .modal-content,
+  .command-palette-content,
+  .animate-slide-up-fade,
+  .animate-slideUp,
+  .animate-scaleIn,
+  .animate-slideInLeft,
+  .animate-slideInRight,
+  .animate-fadeInUp,
+  .animate-fadeInDown,
+  .empty-state,
+  .empty-state-icon,
+  .stagger-item,
+  .toast,
+  .context-menu {
+    animation: fadeIn 120ms ease-out both !important;
+  }
+
+  /* Kill logo hover spin and shimmer (both run in a loop) */
+  .logo-spin:hover,
+  .logo-spin {
+    animation: none !important;
+    transition: none !important;
+  }
+  .skeleton {
+    animation: none;
+    background: var(--background-tertiary);
+  }
+
+  /* Reduce gradient border cost — hover doesn't exist on touch anyway */
+  .gradient-border::before {
+    display: none;
+  }
+
+  /* Force GPU compositing off for hover-only decorations */
+  .bento-item:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Bigger touch targets on native */
+  .btn {
+    min-height: 40px;
+  }
+  .btn-ghost,
+  .btn-icon {
+    min-height: 36px;
+    min-width: 36px;
+  }
+  .sidebar-item {
+    min-height: 40px;
+    padding: 0.5rem 0.625rem;
+  }
+  .context-menu-item {
+    min-height: 44px;
+    padding: 0.75rem 0.875rem;
+  }
+
+  /* Disable :hover row-actions reveal (touch has no hover) so batch action
+     buttons stay tappable without a phantom hover state. */
+  .table tbody tr .row-actions {
+    opacity: 1;
+  }
+  .table tbody tr:hover {
+    background: transparent;
+  }
+  .file-row.is-folder:hover .file-name {
+    color: inherit;
+  }
+  .file-row.is-folder:hover .file-chevron {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+}
+
+/* Even more aggressive for the very smallest screens / oldest devices */
+@media (max-width: 480px) and (hover: none) {
+  /* Cut every transition to a fraction so tapping feels instant */
+  .btn,
+  .input,
+  .sidebar-item,
+  .file-icon,
+  .file-chevron,
+  .context-menu-item,
+  .bento-item {
+    transition-duration: 60ms !important;
+  }
+}
+
+/* Give Capacitor-native runs a body-level marker for further tweaks.
+   NB: we deliberately do NOT add `padding-top: env(safe-area-inset-top)` here.
+   `capacitor.config.json` sets StatusBar.overlaysWebView = false, so Android
+   already reserves that space by shrinking the WebView. Adding CSS padding
+   too creates a double gap (visible as a grey band above the app). If you
+   ever flip overlaysWebView to true, put the padding back on a specific
+   element (Header/Sidebar) instead of body — putting it on body leaks the
+   app's background into that band. */
+html.capacitor-native,
+html.capacitor-native body {
+  overscroll-behavior: none;
 }
 
 /* Mobile-first touch targets */

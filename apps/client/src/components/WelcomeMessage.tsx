@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { Icons } from './Icons';
 import { STORAGE_KEYS } from '../constants';
 
 interface WelcomeMessageProps {
@@ -55,7 +55,7 @@ export function WelcomeMessage({ onConfigure }: WelcomeMessageProps) {
           className="absolute top-2 right-2 p-1.5 text-foreground-muted hover:text-foreground transition-colors z-10"
           aria-label="Dismiss welcome message"
         >
-          <X className="w-4 h-4" aria-hidden="true" />
+          <Icons.X className="w-4 h-4" aria-hidden="true" />
         </button>
 
         <div className="flex items-center gap-3">

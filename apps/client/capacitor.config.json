@@ -2,22 +2,31 @@
   "appId": "com.s3explorer.app",
   "appName": "S3 Explorer",
   "webDir": "dist",
-  "server": {
-    "url": "https://s3.archives.my.id"
-  },
   "android": {
-    "allowMixedContent": true,
-    "webContentsDebuggingEnabled": false
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false,
+    "captureInput": true,
+    "backgroundColor": "#13111C"
+  },
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
   },
   "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    },
     "StatusBar": {
       "overlaysWebView": false,
-      "style": "LIGHT",
+      "style": "DARK",
       "backgroundColor": "#13111C"
     },
     "Keyboard": {
-      "resize": "ionic",
+      "resize": "native",
       "resizeOnFullScreen": true
+    },
+    "App": {
+      "launchAutoHide": true
     }
   }
 }

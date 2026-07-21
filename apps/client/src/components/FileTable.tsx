@@ -1,6 +1,6 @@
 import { useRef, useCallback, useEffect, memo } from 'react';
 import { FixedSizeList as List } from 'react-window';
-import { MoreHorizontal, Check } from 'lucide-react';
+import { Icons } from './Icons';
 import type { S3Object, SortField, SortDirection } from '../types';
 import { formatBytes, formatDate } from '../utils/formatters';
 import { getFileName, getFileIcon } from '../utils/fileUtils';
@@ -48,7 +48,7 @@ function SelectCheckbox({ checked, onChange, ariaLabel }: { checked: boolean; on
             aria-checked={checked}
             role="checkbox"
         >
-            {checked && <Check className="w-3 h-3" />}
+            {checked && <Icons.Check className="w-3 h-3" />}
         </button>
     );
 }
@@ -138,7 +138,7 @@ const FileRow = memo(({ index, style, data }: RowProps) => {
                     aria-label={`More options for ${fileName}`}
                     aria-haspopup="menu"
                 >
-                    <MoreHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
+                    <Icons.MoreHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
             </div>
         </div>
@@ -216,7 +216,7 @@ function StandardRow({ obj, onNavigate, onContextMenu, onItemSelect, isSelected,
                         aria-label={`More options for ${fileName}`}
                         aria-haspopup="menu"
                     >
-                        <MoreHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
+                        <Icons.MoreHorizontal className="w-3.5 h-3.5" aria-hidden="true" />
                     </button>
                 </div>
             </td>

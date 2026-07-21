@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo, lazy, Suspense } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { Folder, Database, Download, Edit3, Trash2, Eye } from 'lucide-react';
+import { Icons } from './components/Icons';
+import { useUpload } from './hooks/useUpload';
 import * as api from './api';
 import type { Bucket, S3Object, ToastState, ContextMenuState, SortField, SortDirection } from './types';
 import { getFileName, isPreviewable } from './utils/fileUtils';
@@ -30,6 +30,7 @@ const FilePreviewModal = lazy(() => import('./components/FilePreviewModal').then
 import { BatchActionsBar } from './components/BatchActionsBar';
 import { STORAGE_KEYS } from './constants';
 import type { Connection } from './api';
+import { onBackButton, isNative } from './native';
 
 export default function App() {
   // Auth state
@@ -190,6 +191,34 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedBucket]);
+
+  // Android hardware back button: pop the topmost transient UI (modal, palette,
+  // context menu, sidebar) before letting the WebView navigate history.
+  // Returning `true` from the handler consumes the event so the runtime doesn't
+  // also pop history / exit the app.
+  useEffect(() => {
+    if (!isNative) return;
+    const unsubscribe = onBackButton(() => {
+      if (batchPreviewObjects.length > 0) { setBatchPreviewObjects([]); return true; }
+      if (previewObject) { setPreviewObject(null); return true; }
+      if (showCommandPalette) { setShowCommandPalette(false); return true; }
+      if (showConnectionManager) { setShowConnectionManager(false); return true; }
+      if (showNewBucket) { setShowNewBucket(false); return true; }
+      if (showNewFolder) { setShowNewFolder(false); return true; }
+      if (showRename) { setShowRename(null); return true; }
+      if (showDelete) { setShowDelete(null); return true; }
+      if (showDeleteBucket) { setShowDeleteBucket(null); return true; }
+      if (contextMenu) { setContextMenu(null); return true; }
+      if (sidebarOpen) { setSidebarOpen(false); return true; }
+      if (searchQuery) { setSearchQuery(''); return true; }
+      if (currentPath) { handleGoBack(); return true; }
+      if (selectedBucket) { setSelectedBucket(null); return true; }
+      return false; // Let the runtime exit the app
+    });
+    return unsubscribe;
+  }, [batchPreviewObjects.length, previewObject, showCommandPalette, showConnectionManager,
+      showNewBucket, showNewFolder, showRename, showDelete, showDeleteBucket, contextMenu,
+      sidebarOpen, searchQuery, currentPath, selectedBucket]);
 
   const showToastMsg = (message: string, type: 'success' | 'error' = 'success') => setToast({ message, type });
 
@@ -393,7 +422,7 @@ export default function App() {
     }
   }, [selectedBucket, currentPath, loadObjects, objects, networkStatus.isOnline, networkStatus.isBackendReachable, uploading]);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, noClick: true });
+  const { getRootProps, getInputProps, isDragActive } = useUpload({ onDrop });
 
   const handleCreateBucket = async () => {
     if (!newName.trim()) return;
@@ -789,7 +818,7 @@ export default function App() {
 
   // Authenticated - show app
   return (
-    <div className="h-screen flex bg-background overflow-hidden">
+    <div className="flex bg-background overflow-hidden" style={{ height: '100dvh' }}>
       {/* Skip link for accessibility */}
       <a
         href="#main-content"
@@ -844,7 +873,7 @@ export default function App() {
         <div className="flex-1 overflow-y-auto">
           {!activeConnection ? (
             <EmptyState
-              icon={Database}
+              icon={Icons.Database}
               title="No connection configured"
               description="Add an S3 connection to get started"
               action={
@@ -857,13 +886,13 @@ export default function App() {
               }
             />
           ) : !selectedBucket ? (
-            <EmptyState icon={Database} title="No bucket selected" description="Select a bucket from the sidebar" />
+            <EmptyState icon={Icons.Database} title="No bucket selected" description="Select a bucket from the sidebar" />
           ) : searching ? (
-            <EmptyState icon={Database} title="Searching..." description="" />
+            <EmptyState icon={Icons.Database} title="Searching..." description="" />
           ) : searchResults && displayObjects.length === 0 ? (
-            <EmptyState icon={Folder} title="No results" description="No files or folders match your search" />
+            <EmptyState icon={Icons.Folder} title="No results" description="No files or folders match your search" />
           ) : displayObjects.length === 0 && !loading ? (
-            <EmptyState icon={Folder} title="Empty folder" description="Drop files here to upload" />
+            <EmptyState icon={Icons.Folder} title="Empty folder" description="Drop files here to upload" />
           ) : (
             <FileTable
               objects={displayObjects}
@@ -901,25 +930,25 @@ export default function App() {
         <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)}>
           {!contextMenu.object.isFolder && isPreviewable(contextMenu.object.key) && (
             <ContextMenuItem
-              icon={Eye}
+              icon={Icons.Eye}
               label="Preview"
               onClick={() => { setPreviewObject(contextMenu.object); setContextMenu(null); }}
             />
           )}
           {!contextMenu.object.isFolder && (
             <ContextMenuItem
-              icon={Download}
+              icon={Icons.Download}
               label="Download"
               onClick={() => { handleDownload(contextMenu.object); setContextMenu(null); }}
             />
           )}
           <ContextMenuItem
-            icon={Edit3}
+            icon={Icons.Edit3}
             label="Rename"
             onClick={() => { setShowRename(contextMenu.object); setNewName(getFileName(contextMenu.object.key)); setContextMenu(null); }}
           />
           <ContextMenuItem
-            icon={Trash2}
+            icon={Icons.Trash2}
             label="Delete"
             danger
             onClick={() => { setShowDelete(contextMenu.object); setContextMenu(null); }}

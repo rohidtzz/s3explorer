@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Database, Plus, Trash2, Copy, Check, Settings, LogOut, Sun, Moon, PanelLeftClose, PanelLeft, Github } from 'lucide-react';
+import { Icons } from './Icons';
 import type { Bucket } from '../types';
 import { useDebounce } from '../hooks/useDebounce';
 import { UI_DELAYS } from '../constants';
@@ -103,10 +103,10 @@ export function Sidebar({
                 </div>
                 <div className="flex items-center">
                     <button onClick={onToggleTheme} className="p-2 text-foreground-muted hover:text-foreground transition-colors" tabIndex={collapsed ? -1 : 0} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>
-                        {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                        {theme === 'dark' ? <Icons.Sun className="w-4 h-4" /> : <Icons.Moon className="w-4 h-4" />}
                     </button>
                     <button onClick={onToggleCollapse} className="p-2 text-foreground-muted hover:text-foreground transition-colors hidden md:flex items-center justify-center" aria-label="Collapse sidebar">
-                        <PanelLeftClose className="w-4 h-4" />
+                        <Icons.PanelLeftClose className="w-4 h-4" />
                     </button>
                 </div>
             </div>
@@ -114,7 +114,6 @@ export function Sidebar({
             {/* Search */}
             <div className="px-2.5 pt-2.5 pb-1 flex-shrink-0">
                 <input
-                    id="bucket-search"
                     type="search"
                     name="bucket-search"
                     placeholder={selectedBucket ? "Search files…" : "Search buckets…"}
@@ -134,7 +133,7 @@ export function Sidebar({
                 <span className="text-xs font-semibold text-foreground-muted uppercase tracking-wider" id="buckets-heading">Buckets</span>
                 {!pinnedBucket && (
                     <button onClick={onNewBucket} className="create-bucket-btn p-1.5 text-foreground-secondary hover:text-foreground transition-all" tabIndex={collapsed ? -1 : 0} aria-label="Create new bucket">
-                        <Plus className="w-3.5 h-3.5" />
+                        <Icons.Plus className="w-3.5 h-3.5" />
                     </button>
                 )}
             </div>
@@ -154,15 +153,15 @@ export function Sidebar({
                             aria-selected={selectedBucket === bucket.name}
                             aria-label={`Bucket: ${bucket.name}`}
                         >
-                            <Database className="sidebar-icon w-3.5 h-3.5 flex-shrink-0" />
+                            <Icons.Database className="sidebar-icon w-3.5 h-3.5 flex-shrink-0" />
                             <span className="flex-1 truncate text-xs">{bucket.name}</span>
                             <div className="flex items-center gap-0.5 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                 <button onClick={e => handleCopyBucketName(e, bucket.name)} className="flex items-center justify-center w-6 h-6 rounded text-foreground-secondary hover:text-accent-purple active:scale-95 transition-all" tabIndex={collapsed ? -1 : 0} aria-label={`Copy: ${bucket.name}`}>
-                                    {copiedBucket === bucket.name ? <Check className="w-3 h-3 text-accent-green" /> : <Copy className="w-3 h-3" />}
+                                    {copiedBucket === bucket.name ? <Icons.Check className="w-3 h-3 text-accent-green" /> : <Icons.Copy className="w-3 h-3" />}
                                 </button>
                                 {!pinnedBucket && (
                                     <button onClick={e => { e.stopPropagation(); onDeleteBucket(bucket.name); }} className="flex items-center justify-center w-6 h-6 rounded text-foreground-secondary hover:text-accent-red active:scale-95 transition-all" tabIndex={collapsed ? -1 : 0} aria-label={`Delete: ${bucket.name}`}>
-                                        <Trash2 className="w-3 h-3" />
+                                        <Icons.Trash2 className="w-3 h-3" />
                                     </button>
                                 )}
                             </div>
@@ -178,17 +177,17 @@ export function Sidebar({
             <div className="flex-shrink-0 border-t border-border px-2.5 py-1.5 pb-safe">
                 {onOpenConnections && (
                     <button onClick={onOpenConnections} className="w-full flex items-center gap-2 h-8 px-2.5 text-foreground-muted hover:text-foreground text-xs transition-colors cursor-pointer" tabIndex={collapsed ? -1 : 0}>
-                        <Settings className="w-3.5 h-3.5 flex-shrink-0" />
+                        <Icons.Settings className="w-3.5 h-3.5 flex-shrink-0" />
                         <span className="flex-1 truncate text-left">{activeConnectionName || 'Connections'}</span>
                     </button>
                 )}
                 <a href="https://github.com/subratomandal/s3explorer" target="_blank" rel="noopener noreferrer" className="w-full flex items-center gap-2 h-8 px-2.5 text-foreground-muted hover:text-foreground text-xs transition-colors" tabIndex={collapsed ? -1 : 0}>
-                    <Github className="w-3.5 h-3.5 flex-shrink-0" />
+                    <Icons.Github className="w-3.5 h-3.5 flex-shrink-0" />
                     <span>GitHub</span>
                 </a>
                 {onLogout && (
                     <button onClick={onLogout} className="w-full flex items-center gap-2 h-8 px-2.5 text-foreground-muted hover:text-accent-red text-xs transition-colors cursor-pointer" tabIndex={collapsed ? -1 : 0}>
-                        <LogOut className="w-3.5 h-3.5 flex-shrink-0" />
+                        <Icons.LogOut className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>Logout</span>
                     </button>
                 )}
@@ -200,14 +199,14 @@ export function Sidebar({
     const collapsedContent = (
         <div className="flex flex-col items-center h-full py-1.5 gap-0.5">
             <button onClick={onToggleCollapse} className="w-8 h-8 flex items-center justify-center text-foreground-muted hover:text-foreground transition-colors flex-shrink-0" aria-label="Expand sidebar" title="Expand sidebar">
-                <PanelLeft className="w-4 h-4" />
+                <Icons.PanelLeft className="w-4 h-4" />
             </button>
             <button onClick={onNavigateHome} className="w-8 h-8 flex items-center justify-center my-0.5 flex-shrink-0" aria-label="Home" title="S3 Explorer">
                 <img src="/logo.svg" alt="S3 Explorer" className="w-5 h-5 logo-themed" />
             </button>
             {!pinnedBucket && (
                 <button onClick={onNewBucket} className="w-8 h-8 flex items-center justify-center text-foreground-muted hover:text-foreground transition-colors flex-shrink-0" aria-label="Create bucket" title="Create bucket">
-                    <Plus className="w-3.5 h-3.5" />
+                    <Icons.Plus className="w-3.5 h-3.5" />
                 </button>
             )}
             <div className="w-5 h-px bg-border my-0.5 flex-shrink-0" />
@@ -222,25 +221,25 @@ export function Sidebar({
                         aria-label={`Bucket: ${bucket.name}`}
                         title={bucket.name}
                     >
-                        <Database className="w-3.5 h-3.5" />
+                        <Icons.Database className="w-3.5 h-3.5" />
                     </button>
                 ))}
             </div>
             <div className="w-5 h-px bg-border my-0.5 flex-shrink-0" />
             <button onClick={onToggleTheme} className="w-8 h-8 flex items-center justify-center text-foreground-muted hover:text-foreground transition-colors flex-shrink-0" aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'} title={theme === 'dark' ? 'Light mode' : 'Dark mode'}>
-                {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                {theme === 'dark' ? <Icons.Sun className="w-3.5 h-3.5" /> : <Icons.Moon className="w-3.5 h-3.5" />}
             </button>
             {onOpenConnections && (
                 <button onClick={onOpenConnections} className="w-8 h-8 flex items-center justify-center text-foreground-muted hover:text-foreground transition-colors flex-shrink-0" aria-label="Connections" title={activeConnectionName || 'Connections'}>
-                    <Settings className="w-3.5 h-3.5" />
+                    <Icons.Settings className="w-3.5 h-3.5" />
                 </button>
             )}
             <a href="https://github.com/subratomandal/s3explorer" target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center text-foreground-muted hover:text-foreground transition-colors flex-shrink-0" aria-label="GitHub" title="GitHub">
-                <Github className="w-3.5 h-3.5" />
+                <Icons.Github className="w-3.5 h-3.5" />
             </a>
             {onLogout && (
                 <button onClick={onLogout} className="w-8 h-8 flex items-center justify-center text-foreground-muted hover:text-accent-red transition-colors flex-shrink-0" aria-label="Logout" title="Logout">
-                    <LogOut className="w-3.5 h-3.5" />
+                    <Icons.LogOut className="w-3.5 h-3.5" />
                 </button>
             )}
         </div>

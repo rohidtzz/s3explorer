@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Match the JS app's background so the status-bar reserve area
+         (drawn by Android, not the WebView) doesn't leak grey/white. -->
+    <color name="appBackground">#13111C</color>
+    <color name="colorPrimary">#13111C</color>
+    <color name="colorPrimaryDark">#13111C</color>
+    <color name="colorAccent">#C049FF</color>
+</resources>

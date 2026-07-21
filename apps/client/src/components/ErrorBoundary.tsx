@@ -1,5 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { Icons } from './Icons';
 
 interface Props {
     children: ReactNode;
@@ -43,7 +43,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <div className="fixed inset-0 bg-background flex items-center justify-center p-4">
                     <div className="max-w-md w-full text-center space-y-6">
                         <div className="w-16 h-16 mx-auto rounded-full bg-accent-red/10 flex items-center justify-center">
-                            <AlertTriangle className="w-8 h-8 text-accent-red" />
+                            <Icons.AlertTriangle className="w-8 h-8 text-accent-red" />
                         </div>
 
                         <div className="space-y-2">
@@ -78,7 +78,7 @@ export class ErrorBoundary extends Component<Props, State> {
                                 onClick={this.handleReload}
                                 className="btn btn-primary flex items-center gap-2"
                             >
-                                <RefreshCw className="w-4 h-4" />
+                                <Icons.RefreshCw className="w-4 h-4" />
                                 Reload Page
                             </button>
                         </div>

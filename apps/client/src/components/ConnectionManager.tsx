@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Trash2, Check, Server, ChevronDown, AlertCircle, RefreshCw, ChevronRight, Link } from 'lucide-react';
+import { Icons } from './Icons';
 import * as api from '../api';
 import type { Connection, ConnectionConfig } from '../api';
 import { Modal } from './Modal';
@@ -351,7 +351,7 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
 
           {error && (
             <div className="mb-4 p-3 bg-accent-red/15 rounded-md text-accent-red text-[13px] flex items-center gap-2 animate-fadeIn">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <Icons.AlertCircle className="w-4 h-4 flex-shrink-0" />
               {error}
             </div>
           )}
@@ -361,12 +361,12 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
               <div className="space-y-2">
                 {loading ? (
                   <div className="flex items-center justify-center py-8 text-foreground-muted">
-                    <RefreshCw className="w-5 h-5 animate-spin mr-2" />
+                    <Icons.RefreshCw className="w-5 h-5 animate-spin mr-2" />
                     Loading...
                   </div>
                 ) : connections.length === 0 ? (
                   <div className="text-center py-6 border border-dashed border-border rounded-md bg-background hover:border-accent-purple/30 hover:bg-accent-purple/5 transition-all cursor-pointer group" onClick={() => { resetForm(); setView('form'); }}>
-                    <Server className="w-8 h-8 mx-auto mb-2 text-foreground-muted group-hover:text-accent-purple transition-colors" />
+                    <Icons.Server className="w-8 h-8 mx-auto mb-2 text-foreground-muted group-hover:text-accent-purple transition-colors" />
                     <p className="text-foreground-secondary font-medium text-sm group-hover:text-accent-purple transition-colors">No connections</p>
                     <p className="text-foreground-muted text-xs mt-1">Click to add your first connection</p>
                   </div>
@@ -384,7 +384,7 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
                       <div className="flex items-center gap-3 min-w-0 pl-2 flex-1">
                         <div className={`w-9 h-9 rounded-md flex-shrink-0 flex items-center justify-center transition-colors ${conn.isActive ? 'bg-accent-purple/20 text-accent-purple' : 'bg-background-hover text-foreground-muted group-hover:bg-accent-purple/10 group-hover:text-accent-purple'
                           }`}>
-                          <Server className="w-4 h-4" />
+                          <Icons.Server className="w-4 h-4" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
@@ -410,16 +410,16 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
                           className="p-1.5 text-foreground-muted hover:text-accent-purple rounded transition-colors"
                           title="Edit"
                         >
-                          <Link className="w-4 h-4" />
+                          <Icons.Link className="w-4 h-4" />
                         </button>
                         <button
                           onClick={(e) => handleDelete(e, conn.id)}
                           className="p-1.5 text-foreground-muted hover:text-accent-red rounded transition-colors"
                           title="Delete"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Icons.Trash2 className="w-4 h-4" />
                         </button>
-                        <ChevronRight className="w-4 h-4 text-foreground-muted group-hover:text-accent-purple group-hover:translate-x-0.5 transition-all ml-1" />
+                        <Icons.ChevronRight className="w-4 h-4 text-foreground-muted group-hover:text-accent-purple group-hover:translate-x-0.5 transition-all ml-1" />
                       </div>
                     </div>
                   ))
@@ -431,7 +431,7 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
                   onClick={() => { resetForm(); setView('form'); }}
                   className="group w-full mt-3 py-2.5 px-4 rounded-md border border-dashed border-border text-foreground-secondary hover:text-accent-purple hover:border-accent-purple hover:bg-accent-purple/5 transition-all flex items-center justify-center gap-2 text-sm font-medium"
                 >
-                  <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  <Icons.Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   Add Connection
                 </button>
               )}
@@ -453,7 +453,7 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
                         <option key={p.id} value={p.id}>{p.name}</option>
                       ))}
                     </select>
-                    <ChevronDown className="w-4 h-4 text-foreground-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Icons.ChevronDown className="w-4 h-4 text-foreground-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
                 </div>
 
@@ -485,7 +485,7 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
                           <option key={r.value} value={r.value}>{r.label}</option>
                         ))}
                       </select>
-                      <ChevronDown className="w-4 h-4 text-foreground-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <Icons.ChevronDown className="w-4 h-4 text-foreground-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
                   </div>
                 </div>
@@ -568,7 +568,7 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
                         }`}
                       aria-hidden="true"
                     >
-                      {form.forcePathStyle && <Check className="w-3 h-3 text-white" aria-hidden="true" />}
+                      {form.forcePathStyle && <Icons.Check className="w-3 h-3 text-white" aria-hidden="true" />}
                     </span>
                     <input
                       type="checkbox"
@@ -585,7 +585,7 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
                     className="group text-xs text-foreground-muted hover:text-accent-purple transition-colors flex items-center gap-1.5 disabled:opacity-50 px-2 py-1 rounded hover:bg-accent-purple/10"
                     aria-label="Test connection"
                   >
-                    <RefreshCw className={`w-3 h-3 ${testing ? 'animate-spin' : 'group-hover:rotate-45'} transition-transform`} aria-hidden="true" />
+                    <Icons.RefreshCw className={`w-3 h-3 ${testing ? 'animate-spin' : 'group-hover:rotate-45'} transition-transform`} aria-hidden="true" />
                     {testing ? 'Testing…' : 'Test'}
                   </button>
                 </div>
@@ -601,9 +601,9 @@ export function ConnectionManager({ isOpen, onClose, onConnectionChange }: Conne
                     aria-live="polite"
                   >
                     {testResult.success ? (
-                      <Check className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                      <Icons.Check className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                     ) : (
-                      <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                      <Icons.AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                     )}
                     {testResult.message}
                   </div>

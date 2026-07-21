@@ -1,4 +1,4 @@
-import { Upload } from 'lucide-react';
+import { Icons } from './Icons';
 
 interface DropOverlayProps {
     isDragActive: boolean;
@@ -17,7 +17,7 @@ export function DropOverlay({ isDragActive }: DropOverlayProps) {
             <div className="absolute inset-4 border-2 border-dashed border-accent-pink rounded-lg bg-background/90" aria-hidden="true" />
             <div className="relative text-center">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-purple to-accent-pink flex items-center justify-center mx-auto mb-4">
-                    <Upload className="w-8 h-8 text-white" aria-hidden="true" />
+                    <Icons.Upload className="w-8 h-8 text-white" aria-hidden="true" />
                 </div>
                 <p className="text-base font-medium">Drop to upload</p>
             </div>

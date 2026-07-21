@@ -1,15 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import {
-  Search,
-  Database,
-  FolderPlus,
-  Upload,
-  RefreshCw,
-  Settings,
-  ArrowLeft,
-  Home,
-  ChevronRight,
-} from 'lucide-react';
+import { Icons } from './Icons';
 import type { Bucket, CommandAction } from '../types';
 
 interface CommandPaletteProps {
@@ -63,14 +53,14 @@ export function CommandPalette({
         id: 'go-back',
         label: 'Go Back',
         category: 'navigation',
-        icon: ArrowLeft,
+        icon: Icons.ArrowLeft,
         onSelect: () => { onGoBack(); onClose(); },
       });
       items.push({
         id: 'go-root',
         label: 'Go to Root',
         category: 'navigation',
-        icon: Home,
+        icon: Icons.Home,
         onSelect: () => { onNavigateToRoot(); onClose(); },
       });
     }
@@ -80,21 +70,21 @@ export function CommandPalette({
         id: 'refresh',
         label: 'Refresh',
         category: 'actions',
-        icon: RefreshCw,
+        icon: Icons.RefreshCw,
         onSelect: () => { onRefresh(); onClose(); },
       });
       items.push({
         id: 'new-folder',
         label: 'New Folder',
         category: 'actions',
-        icon: FolderPlus,
+        icon: Icons.FolderPlus,
         onSelect: () => { onNewFolder(); onClose(); },
       });
       items.push({
         id: 'upload',
         label: 'Upload Files',
         category: 'actions',
-        icon: Upload,
+        icon: Icons.Upload,
         onSelect: () => { onUpload(); onClose(); },
       });
     }
@@ -103,7 +93,7 @@ export function CommandPalette({
       id: 'new-bucket',
       label: 'Create Bucket',
       category: 'actions',
-      icon: Database,
+      icon: Icons.Database,
       onSelect: () => { onNewBucket(); onClose(); },
     });
 
@@ -111,7 +101,7 @@ export function CommandPalette({
       id: 'connections',
       label: 'Connection Manager',
       category: 'connections',
-      icon: Settings,
+      icon: Icons.Settings,
       onSelect: () => { onOpenConnections(); onClose(); },
     });
 
@@ -120,7 +110,7 @@ export function CommandPalette({
         id: `bucket-${bucket.name}`,
         label: bucket.name,
         category: 'buckets',
-        icon: Database,
+        icon: Icons.Database,
         onSelect: () => { onSelectBucket(bucket.name); onClose(); },
       });
     });
@@ -218,7 +208,7 @@ export function CommandPalette({
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-          <Search className="w-5 h-5 text-foreground-muted flex-shrink-0" />
+          <Icons.Search className="w-5 h-5 text-foreground-muted flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -272,7 +262,7 @@ export function CommandPalette({
                           Active
                         </span>
                       )}
-                      <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'text-accent-pink translate-x-0.5' : 'text-foreground-muted'}`} />
+                      <Icons.ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'text-accent-pink translate-x-0.5' : 'text-foreground-muted'}`} />
                     </button>
                   );
                 })}

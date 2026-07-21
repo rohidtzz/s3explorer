@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { Icons } from './Icons';
 
 interface BatchActionsBarProps {
     selectedCount: number;
@@ -54,7 +54,7 @@ export function BatchActionsBar({
                     className="flex items-center justify-center w-8 py-2 bg-background-secondary text-foreground-muted hover:bg-background-hover hover:text-foreground transition-colors"
                     aria-label="Clear selection"
                 >
-                    <X className="w-3.5 h-3.5" />
+                    <Icons.X className="w-3.5 h-3.5" />
                 </button>
             </div>
         </div>
